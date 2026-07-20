@@ -1,97 +1,84 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Live Market</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#6366f1',
-            live: '#22c55e',
-          }
-        }
-      }
-    }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .glass { @apply bg-slate-800/70 backdrop-blur-lg border border-slate-700/50 rounded-2xl p-6; }
-      .stat-card { @apply glass transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10; }
-      .btn-tab { @apply px-4 py-2 rounded-lg font-medium transition-all; }
-      .btn-tab.active { @apply bg-primary text-white; }
-    }
-  </style>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Crypto Live Market</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
 
-  <header class="container mx-auto px-4 py-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold flex items-center gap-2">
-        <span class="text-3xl">🚀</span> 
-        <span>Crypto Live Market</span>
-        <span class="bg-live/20 text-live px-3 py-1 rounded-full text-sm font-semibold animate-pulse">LIVE</span>
-      </h1>
-      <button id="toggleDark" class="p-2 rounded-full hover:bg-slate-800">
-        <i class="fa fa-moon-o text-xl"></i>
-      </button>
-    </div>
-    
-    <div class="mt-6 relative">
-      <input type="text" id="searchInput" placeholder="Cari Coin..." 
-        class="w-full bg-slate-800 rounded-xl py-3 px-5 pl-12 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-    </div>
-  </header>
+<body>
 
-  <main class="container mx-auto px-4 pb-16">
-    <!-- Statistik -->
-    <section class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-      <div class="stat-card">
-        <p class="text-slate-400 mb-1">Total Market Cap</p>
-        <h2 id="totalMarketCap" class="text-2xl font-bold">$0</h2>
-      </div>
-      <div class="stat-card">
-        <p class="text-slate-400 mb-1">24H Volume</p>
-        <h2 id="volume24h" class="text-2xl font-bold">$0</h2>
-      </div>
-      <div class="stat-card">
-        <p class="text-slate-400 mb-1">BTC Dominance</p>
-        <h2 id="btcDominance" class="text-2xl font-bold">0%</h2>
-      </div>
-      <div class="stat-card">
-        <p class="text-slate-400 mb-1">Fear & Greed Index</p>
-        <h2 id="fearGreed" class="text-2xl font-bold">--</h2>
-      </div>
-    </section>
+<header>
 
-    <!-- Tab -->
-    <section class="flex gap-2 mb-6 overflow-x-auto pb-2">
-      <button class="btn-tab active bg-slate-800" data-tab="all">Semua</button>
-      <button class="btn-tab bg-slate-800" data-tab="gainers">🚀 Gainers</button>
-      <button class="btn-tab bg-slate-800" data-tab="losers">📉 Losers</button>
-      <button class="btn-tab bg-slate-800" data-tab="trending">🔥 Trending</button>
-      <button class="btn-tab bg-slate-800" data-tab="watchlist">⭐ Watchlist</button>
-    </section>
+<div class="logo">
 
-    <!-- Daftar Koin -->
-    <section id="coinList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="col-span-full text-center py-16 text-slate-400">
-        <i class="fa fa-spinner fa-spin text-3xl mb-4"></i>
-        <p>Memuat data pasar...</p>
-      </div>
-    </section>
-  </main>
+<h2>🚀 Crypto Live Market</h2>
 
-  <!-- Panggil JS -->
-  <script src="api.js"></script>
-  <script src="script.js"></script>
+<span class="live">LIVE</span>
+
+</div>
+
+<div class="search">
+
+<input
+type="text"
+id="search"
+placeholder="Cari Coin..."
+>
+
+</div>
+
+</header>
+
+<section class="stats">
+
+<div class="card">
+
+<h4>Total Market Cap</h4>
+
+<h2 id="marketCap">$0</h2>
+
+</div>
+
+<div class="card">
+
+<h4>24H Volume</h4>
+
+<h2 id="volume">$0</h2>
+
+</div>
+
+<div class="card">
+
+<h4>BTC Dominance</h4>
+
+<h2 id="btcdom">0%</h2>
+
+</div>
+
+</section>
+
+<section class="coin-list" id="coinList">
+
+<!-- Data Coin Akan Ditampilkan Di Sini -->
+
+</section>
+
+<script src="chart.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
