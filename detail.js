@@ -1,86 +1,249 @@
-// Ambil ID koin dari URL (contoh: detail.html?id=bitcoin)
-const urlParams = new URLSearchParams(window.location.search);
-const coinId = urlParams.get('id');
+// ======================================
+// DETAIL.JS
+// Crypto Live Market
+// ======================================
 
-// Elemen DOM halaman detail
-const detailElements = {
-  coinName: document.getElementById('coinName'),
-  coinSymbol: document.getElementById('coinSymbol'),
-  coinImage: document.getElementById('coinImage'),
-  currentPrice: document.getElementById('currentPrice'),
-  priceChange24h: document.getElementById('priceChange24h'),
-  marketCap: document.getElementById('marketCap'),
-  volume24h: document.getElementById('volume24h'),
-  high24h: document.getElementById('high24h'),
-  low24h: document.getElementById('low24h'),
-  description: document.getElementById('description'),
-  chartContainer: document.getElementById('priceChart'),
-  loading: document.getElementById('loading')
-};
+const coinId = new URLSearchParams(window.location.search).get("id");
 
-// Format angka
-function formatNumber(num) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: (num < 1) ? 6 : 2
-  }).format(num);
+const $ = (id) => document.getElementById(id);
+
+let chart;
+
+// ===============================
+// FORMAT MONEY
+// ===============================
+
+function money(value) {
+
+    return new Intl.NumberFormat("en-US", {
+
+        style: "currency",
+
+        currency: "USD",
+
+        minimumFractionDigits: value < 1 ? 6 : 2,
+
+        maximumFractionDigits: value < 1 ? 6 : 2
+
+    }).format(value);
+
 }
 
-// 📡 Ambil DATA RINCIAN SATU KOIN
-async function fetchCoinDetail() {
-  if (!coinId) {
-    alert('ID Koin tidak ditemukan!');
-    window.location.href = 'index.html';
-    return;
-  }
+// ===============================
+// LOAD COIN DETAIL
+// ===============================
 
-  try {
-    detailElements.loading.classList.remove('d-none');
-    
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=true`);
-    
-    if (!res.ok) throw new Error('Gagal memuat data koin');
-    const data = await res.json();
+async function loadCoin(days = 7) {
 
-    // Isi data ke halaman
-    detailElements.coinName.textContent = data.name;
-    detailElements.coinSymbol.textContent = data.symbol.toUpperCase();
-    detailElements.coinImage.src = data.image.large;
-    detailElements.currentPrice.textContent = formatNumber(data.market_data.current_price.usd);
-    
-    const change = data.market_data.price_change_percentage_24h;
-    detailElements.priceChange24h.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
-    detailElements.priceChange24h.className = change >= 0 ? 'text-green-400' : 'text-red-400';
-    
-    detailElements.marketCap.textContent = formatNumber(data.market_data.market_cap.usd);
-    detailElements.volume24h.textContent = formatNumber(data.market_data.total_volume.usd);
-    detailElements.high24h.textContent = formatNumber(data.market_data.high_24h.usd);
-    detailElements.low24h.textContent = formatNumber(data.market_data.low_24h.usd);
-    
-    // Deskripsi (bersihkan tag HTML jika ada)
-    detailElements.description.innerHTML = data.description.en?.replace(/<[^>]*>/g, '') || 'Tidak ada deskripsi.';
+    if (!coinId) {
 
-    // Panggil buat gambar grafik (pakai chart.js)
-    if (typeof drawDetailChart === "function") {
-      drawDetailChart(data.market_data.sparkline_7d.price);
+        alert("Coin ID tidak ditemukan");
+
+        window.location.href = "index.html";
+
+        return;
+
     }
 
-  } catch (err) {
-    console.error('Error Detail:', err);
-    alert('Gagal memuat rincian, coba lagi nanti.');
-  } finally {
-    detailElements.loading.classList.add('d-none');
-  }
+    try {
+
+        const detail = await fetch(
+
+            `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`
+
+        ).then(res => {
+
+            if (!res.ok) throw new Error("Coin Detail Error");
+
+            return res.json();
+
+        });
+
+        $("coinName").textContent = detail.name;
+
+        $("coinSymbol").textContent = detail.symbol.toUpperCase();
+
+        $("coinImage").src = detail.image.large;
+
+        $("currentPrice").textContent = money(
+
+            detail.market_data.current_price.usd
+
+        );
+
+        const change =
+
+            detail.market_data.price_change_percentage_24h;
+
+        $("priceChange24h").textContent =
+
+            `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+
+        $("priceChange24h").style.color =
+
+            change >= 0 ? "#16c784" : "#ea3943";
+
+        $("marketCap").textContent =
+
+            money(detail.market_data.market_cap.usd);
+
+        $("volume24h").textContent =
+
+            money(detail.market_data.total_volume.usd);
+
+        $("high24h").textContent =
+
+            money(detail.market_data.high_24h.usd);
+
+        $("low24h").textContent =
+
+            money(detail.market_data.low_24h.usd);
+
+        $("description").textContent =
+
+            (detail.description.en || "Tidak ada deskripsi")
+
+            .replace(/<[^>]+>/g, "")
+
+            .slice(0, 800);
+
+        const market = await fetch(
+
+            `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`
+
+        ).then(res => res.json());
+
+        drawChart(market.prices);
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        alert("Gagal memuat data Coin.");
+
+    }
+
+}
+// ===============================
+// TRADINGVIEW CHART
+// ===============================
+
+function drawChart(prices) {
+
+    const container = $("priceChart");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    chart = LightweightCharts.createChart(container, {
+
+        width: container.clientWidth,
+
+        height: 380,
+
+        layout: {
+
+            background: {
+
+                color: "#0B1020"
+
+            },
+
+            textColor: "#B8C1CC"
+
+        },
+
+        grid: {
+
+            vertLines: {
+
+                color: "#1E293B"
+
+            },
+
+            horzLines: {
+
+                color: "#1E293B"
+
+            }
+
+        },
+
+        rightPriceScale: {
+
+            borderColor: "#334155"
+
+        },
+
+        timeScale: {
+
+            borderColor: "#334155",
+
+            timeVisible: true,
+
+            secondsVisible: false
+
+        }
+
+    });
+
+    const series = chart.addAreaSeries({
+
+        lineColor: "#16C784",
+
+        topColor: "rgba(22,199,132,.45)",
+
+        bottomColor: "rgba(22,199,132,.05)",
+
+        lineWidth: 2
+
+    });
+
+    series.setData(
+
+        prices.map(item => ({
+
+            time: Math.floor(item[0] / 1000),
+
+            value: item[1]
+
+        }))
+
+    );
+
+    chart.timeScale().fitContent();
+
+    window.addEventListener("resize", () => {
+
+        chart.applyOptions({
+
+            width: container.clientWidth
+
+        });
+
+    });
+
 }
 
-// 🔄 Kembali ke halaman utama
-function goBack() {
-  window.location.href = 'index.html';
-}
+// ===============================
+// TIMEFRAME
+// ===============================
 
-// Jalankan saat halaman siap
-document.addEventListener('DOMContentLoaded', () => {
-  fetchCoinDetail();
+window.changeTimeframe = function(days){
+
+    loadCoin(days);
+
+};
+
+// ===============================
+// START
+// ===============================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    loadCoin(7);
+
 });
