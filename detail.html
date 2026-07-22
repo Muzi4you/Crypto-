@@ -1,34 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Coin Detail</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
-    background:#0b1020;
-    color:white;
-    font-family:sans-serif;
-    padding:20px;
+
+background:#0B1020;
+
+color:white;
+
+font-family:Arial,sans-serif;
+
+padding:20px;
+
 }
-canvas{
-    width:100%;
-    max-width:900px;
+
+.header{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+margin-bottom:20px;
+
 }
+
+.header img{
+
+width:60px;
+
+height:60px;
+
+border-radius:50%;
+
+}
+
+.symbol{
+
+color:#9CA3AF;
+
+margin-top:5px;
+
+}
+
+.price{
+
+font-size:32px;
+
+font-weight:bold;
+
+margin-top:15px;
+
+}
+
+#priceChange24h{
+
+font-size:18px;
+
+font-weight:bold;
+
+margin-top:10px;
+
+}
+
+#priceChart{
+
+width:100%;
+
+height:380px;
+
+margin-top:25px;
+
+margin-bottom:25px;
+
+}
+
+.info{
+
+background:#151C2F;
+
+padding:15px;
+
+border-radius:15px;
+
+margin-top:15px;
+
+}
+
+.info p{
+
+margin:10px 0;
+
+}
+
+.desc{
+
+margin-top:20px;
+
+line-height:1.7;
+
+color:#D1D5DB;
+
+}
+
+button{
+
+margin-top:20px;
+
+padding:12px 20px;
+
+background:#16C784;
+
+border:none;
+
+color:white;
+
+border-radius:10px;
+
+font-size:16px;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+opacity:.9;
+
+}
+
 </style>
 
 </head>
+
 <body>
 
-<h2 id="title">Loading...</h2>
+<div class="header">
 
-<canvas id="chart"></canvas>
+<img id="coinImage">
+
+<div>
+
+<h1 id="coinName">Loading...</h1>
+
+<p id="coinSymbol" class="symbol"></p>
+
+</div>
+
+</div>
+
+<div class="price" id="currentPrice">$0</div>
+
+<div id="priceChange24h">0%</div>
+
+<div id="priceChart"></div>
+
+<div class="info">
+
+<p><b>Market Cap</b><br><span id="marketCap"></span></p>
+
+<p><b>24H Volume</b><br><span id="volume24h"></span></p>
+
+<p><b>24H High</b><br><span id="high24h"></span></p>
+
+<p><b>24H Low</b><br><span id="low24h"></span></p>
+
+</div>
+
+<div class="desc">
+
+<h2>Description</h2>
+
+<p id="description"></p>
+
+</div>
+
+<button onclick="history.back()">
+
+← Kembali
+
+</button>
+
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
 <script src="detail.js"></script>
 
 </body>
+
 </html>
